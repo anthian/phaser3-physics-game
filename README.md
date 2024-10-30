@@ -1,6 +1,6 @@
 # Phaser Vite TypeScript Physics game
 
-[![GitHub](https://img.shields.io/github/license/anthian/phaser3-physics-game)](/LICENSE)
+[![GitHub](https://img.shields.io/github/license/anthian/phaser3-physics-game?v1)](/LICENSE)
 [![ESLint](https://github.com/anthian/phaser3-physics-game/actions/workflows/eslint.yml/badge.svg?branch=main)](https://github.com/anthian/phaser3-physics-game/actions/workflows/eslint.yml)
 
 This is a Phaser 3 project Physics game that uses Vite for bundling. It supports hot-reloading for quick development workflow, includes TypeScript support and scripts to generate production-ready builds. 
