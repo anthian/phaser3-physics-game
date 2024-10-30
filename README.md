@@ -61,13 +61,13 @@ To load static files such as audio files, videos, etc place them into the `publi
 ```js
 preload ()
 {
-    //  This is an example of an imported bundled image.
-    //  Remember to import it at the top of this file
-    this.load.image('logo', logoImg);
+	//  This is an example of an imported bundled image.
+	//  Remember to import it at the top of this file
+	this.load.image('logo', logoImg);
 
-    //  This is an example of loading a static image
-    //  from the public/assets folder:
-    this.load.image('background', 'assets/bg.png');
+	//  This is an example of loading a static image
+	//  from the public/assets folder:
+	this.load.image('background', 'assets/bg.png');
 }
 ```
 

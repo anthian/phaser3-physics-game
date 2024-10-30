@@ -1,35 +1,35 @@
 {
-    "compilerOptions": {
-        "target": "ES2022",
-        "useDefineForClassFields": true,
-        "module": "ES2022",
-        "lib": [
-            "ES2022",
-            "DOM",
-            "DOM.Iterable"
-        ],
-        "types": [
-            "vite/client"
-        ],
-        "skipLibCheck": true,
-        /* Bundler mode */
-        "moduleResolution": "bundler",
-        "esModuleInterop" : false,
-        "allowSyntheticDefaultImports" : true,
-        "forceConsistentCasingInFileNames" : true,
-        "noEmit": true,
-        "allowImportingTsExtensions": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        /* Linting */
-        "strict": true,
-        "strictPropertyInitialization": false,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true
-    },
-    "include": [
-        "src/**/*", 
-        "./test/**/*"
-    ]
+	"compilerOptions": {
+		"target": "ES2022",
+		"useDefineForClassFields": true,
+		"module": "ES2022",
+		"lib": [
+			"ES2022",
+			"DOM",
+			"DOM.Iterable"
+		],
+		"types": [
+			"vite/client"
+		],
+		"skipLibCheck": true,
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"esModuleInterop" : false,
+		"allowSyntheticDefaultImports" : true,
+		"forceConsistentCasingInFileNames" : true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		/* Linting */
+		"strict": true,
+		"strictPropertyInitialization": false,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true
+	},
+	"include": [
+		"src/**/*", 
+		"./test/**/*"
+	]
 }
