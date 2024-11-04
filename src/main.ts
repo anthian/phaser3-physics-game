@@ -14,12 +14,12 @@ const config: Types.Core.GameConfig = {
 	height: 450,
 	parent: 'game-container',
 	physics: {
-		default: 'arcade',
-		arcade: {
+		default: 'matter',
+		matter: {
 			debug: false,
 			gravity: {
 				x: 0,
-				y: 400
+				y: 1
 			}
 		}
 	},

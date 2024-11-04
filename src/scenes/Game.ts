@@ -1,62 +1,90 @@
 import { 
 	Scene, 
 	GameObjects, 
-	Input, 
-	Types, 
+	Input,
 	Curves, 
 	Math,
-	Physics
+	Physics,
+	Types
 } from 'phaser';
-
 export class Game extends Scene
 {
 	background: GameObjects.Image;
-	pinkBall: Types.Physics.Arcade.ImageWithDynamicBody;
-	blueBall: Types.Physics.Arcade.ImageWithDynamicBody;
-	firstPointerUp: boolean;
+	pinkBall: Physics.Matter.Image;
+	blueBall: Physics.Matter.Image;
 	graphics: GameObjects.Graphics;
 	path: Curves.Path | null;
-	pathGroup: Physics.Arcade.Group; 
 
 	constructor ()
 	{
 		super({ key: "Game" });
-		this.firstPointerUp = true;
 	}
 
 	init(){
-		this.physics.world.pause();
+		this.matter.world.pause();
 	}
 
 	create ()
 	{
 		this.background = this.add.image(this.scale.width/2, this.scale.height/2, 'background');
-		this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
+
+		//Set World bounds
+		this.matter.world.setBounds(10, 10, this.scale.width-20, this.scale.height-20);
 		
-		this.pinkBall = this.physics.add.image(350, 100, 'pink-ball');
-		this.pinkBall.setCollideWorldBounds(true);
+		const ballCategory = this.matter.world.nextCategory();
+		const drawCategory = this.matter.world.nextGroup();
+
+		this.pinkBall = this.matter.add.image(350, 100, 'pink-ball', undefined, { label: 'ball'});
 		this.pinkBall.setScale(0.25, 0.25);
-		this.pinkBall.setBounce(0.5);
+		this.pinkBall.setCircle(this.pinkBall.width * 0.25/2);
+		this.pinkBall.setBounce(0.6);
+		this.pinkBall.setFriction(0.005);
+		this.pinkBall.setCollisionCategory(ballCategory);
+        this.pinkBall.setCollidesWith([ ballCategory, drawCategory ]);
 
-		this.blueBall = this.physics.add.image(550, 100, 'blue-ball');
-		this.blueBall.setCollideWorldBounds(true);
+		this.blueBall = this.matter.add.image(550, 100, 'blue-ball', undefined, { label: 'ball'});
 		this.blueBall.setScale(0.25, 0.25);
-		this.blueBall.setBounce(0.5);
+		this.blueBall.setCircle(this.blueBall.width * 0.25/2);
+		this.blueBall.setBounce(0.6);
+		this.blueBall.setFriction(0.005);
+		this.blueBall.setCollisionCategory(ballCategory);
+		this.pinkBall.setCollidesWith([ ballCategory, drawCategory ]);
 
-		this.physics.add.collider(this.pinkBall, this.blueBall);
+		this.pinkBall.setOnCollideWith(this.blueBall.body!, (body: MatterJS.BodyType, collisionData: Types.Physics.Matter.MatterCollisionData) => {
+			console.log("collision of balls Detected");
+
+			const midPointX = (collisionData.bodyA.position.x + collisionData.bodyB.position.x) / 2;
+			const midPointY = (collisionData.bodyA.position.y + collisionData.bodyB.position.y) / 2;
+			const emitter = this.add.particles(midPointX, midPointY, 'star-particle', {
+				speed: { min: 50, max: 200},
+				scale: { start: 1.2, end: 0},
+				lifespan: 4000,
+				blendMode: Phaser.BlendModes.OVERLAY,
+				angle: { min: 0, max: 360 },
+				quantity: 50,
+				emitting: false
+			});
+			emitter.explode();
+			this.matter.world.pause();
+		});
 
 		this.graphics = this.add.graphics(); 
-		this.pathGroup = this.physics.add.group({collideWorldBounds: true});
-		this.physics.add.collider(this.pathGroup, this.pinkBall);
-		this.physics.add.collider(this.pathGroup, this.blueBall);
+		const bodyParts: Physics.Matter.Sprite[] =[];
 
 		this.input.on('pointerdown', (pointer: Input.Pointer) => {
-			console.log("pointerdown event");
+			this.matter.world.pause();
+			if(this.path !== null && typeof this.path !== 'undefined'){
+				this.path.destroy();
+			}
+			if(bodyParts.length > 0){
+				for(let i=bodyParts.length-1;i>=0;i--){
+					bodyParts.pop()?.destroy();
+				}
+			}
 			this.path = new Curves.Path(pointer.x, pointer.y);
 		}, this);
 
 		this.input.on('pointermove', (pointer: Input.Pointer) => {
-			console.log("pointermove event");
 			if (pointer.isDown) {
 				const points: Math.Vector2[] = pointer.getInterpolatedPosition(5);
 				if(this.path != null){
@@ -66,22 +94,30 @@ export class Game extends Scene
 		}, this);
 	
 		this.input.on('pointerup', () => {
-			console.log("pointerup event");
-			if(this.firstPointerUp){
-				this.firstPointerUp = false;
-			}else{
-				//Convert path to points array to apply physics
-				if(this.path != null){
-					const points = this.path.getPoints(1);
-					console.log(points.length);
-					points.forEach(point => { 
-						const circle = this.add.circle(point.x, point.y, 3, 0x333333, 0.8); 
-						this.physics.add.existing(circle);
-						this.pathGroup.add(circle);
-					});
-					this.path = null;
-					this.physics.world.resume();
-				}
+			//Convert path to points array to apply physics
+			if(this.path !== null && typeof this.path !== 'undefined'){
+				const points = this.path.getPoints(2);
+				console.log(`#points: ${points.length}`);
+
+				points.forEach(point => { 
+					const circleBody = this.matter.add.sprite(
+						point.x, 
+						point.y, 
+						'brush-sprite',
+						undefined,
+						{
+							isStatic: true,
+							friction: 0, 
+							shape: {type: 'circle', radius: 2.5 }
+						}
+					);
+					circleBody.setCollisionCategory(drawCategory);
+					circleBody.setCollidesWith([ballCategory]);
+					bodyParts.push(circleBody);
+				});
+
+				this.path = null;
+				this.matter.world.resume();
 			}
 			
 		}, this);
