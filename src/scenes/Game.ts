@@ -53,17 +53,16 @@ export class Game extends Scene
 		this.pinkBall.setCollidesWith([ ballCategory, drawCategory ]);
 
 		this.pinkBall.setOnCollideWith(this.blueBall.body!, (_body: MatterJS.BodyType, collisionData: Types.Physics.Matter.MatterCollisionData) => {
-			console.log("collision of balls Detected");
-
 			const midPointX = (collisionData.bodyA.position.x + collisionData.bodyB.position.x) / 2;
 			const midPointY = (collisionData.bodyA.position.y + collisionData.bodyB.position.y) / 2;
 			const emitter = this.add.particles(midPointX, midPointY, 'star-particle', {
 				speed: { min: 50, max: 200},
 				scale: { start: 1.2, end: 0},
-				lifespan: 4000,
+				lifespan: 3000,
 				blendMode: Phaser.BlendModes.OVERLAY,
 				angle: { min: 0, max: 360 },
-				quantity: 50,
+				rotate: { min: 0, max: 270 },
+				quantity: 100,
 				emitting: false
 			});
 			emitter.explode();
