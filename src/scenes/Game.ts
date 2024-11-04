@@ -7,6 +7,8 @@ import {
 	Physics,
 	Types
 } from 'phaser';
+
+import simplifyPath from '../helpers/simplifyPath';
 export class Game extends Scene
 {
 	background: GameObjects.Image;
@@ -50,7 +52,7 @@ export class Game extends Scene
 		this.blueBall.setCollisionCategory(ballCategory);
 		this.pinkBall.setCollidesWith([ ballCategory, drawCategory ]);
 
-		this.pinkBall.setOnCollideWith(this.blueBall.body!, (body: MatterJS.BodyType, collisionData: Types.Physics.Matter.MatterCollisionData) => {
+		this.pinkBall.setOnCollideWith(this.blueBall.body!, (_body: MatterJS.BodyType, collisionData: Types.Physics.Matter.MatterCollisionData) => {
 			console.log("collision of balls Detected");
 
 			const midPointX = (collisionData.bodyA.position.x + collisionData.bodyB.position.x) / 2;
@@ -96,10 +98,10 @@ export class Game extends Scene
 		this.input.on('pointerup', () => {
 			//Convert path to points array to apply physics
 			if(this.path !== null && typeof this.path !== 'undefined'){
-				const points = this.path.getPoints(2);
-				console.log(`#points: ${points.length}`);
+				const points = this.path.getPoints(3);
+				const simplifiedPoints = simplifyPath(points, 1);
 
-				points.forEach(point => { 
+				simplifiedPoints.forEach(point => { 
 					const circleBody = this.matter.add.sprite(
 						point.x, 
 						point.y, 
