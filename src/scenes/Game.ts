@@ -8,7 +8,7 @@ import {
 	Types
 } from 'phaser';
 
-import simplifyPath from '../helpers/simplifyPath';
+import UtilsHelper from '../helpers/UtilsHelper';
 export class Game extends Scene
 {
 	background: GameObjects.Image;
@@ -36,7 +36,7 @@ export class Game extends Scene
 		const ballCategory = this.matter.world.nextCategory();
 		const drawCategory = this.matter.world.nextGroup();
 
-		this.pinkBall = this.matter.add.image(350, 100, 'pink-ball', undefined, { label: 'ball'});
+		this.pinkBall = this.matter.add.image(350, 100, 'pink-ball', undefined, { label: 'ball', mass: 10});
 		this.pinkBall.setScale(0.25, 0.25);
 		this.pinkBall.setCircle(this.pinkBall.width * 0.25/2);
 		this.pinkBall.setBounce(0.6);
@@ -44,7 +44,7 @@ export class Game extends Scene
 		this.pinkBall.setCollisionCategory(ballCategory);
         this.pinkBall.setCollidesWith([ ballCategory, drawCategory ]);
 
-		this.blueBall = this.matter.add.image(550, 100, 'blue-ball', undefined, { label: 'ball'});
+		this.blueBall = this.matter.add.image(550, 100, 'blue-ball', undefined, { label: 'ball', mass: 10});
 		this.blueBall.setScale(0.25, 0.25);
 		this.blueBall.setCircle(this.blueBall.width * 0.25/2);
 		this.blueBall.setBounce(0.6);
@@ -98,7 +98,7 @@ export class Game extends Scene
 			//Convert path to points array to apply physics
 			if(this.path !== null && typeof this.path !== 'undefined'){
 				const points = this.path.getPoints(3);
-				const simplifiedPoints = simplifyPath(points, 1);
+				const simplifiedPoints = UtilsHelper.simplifyPath(points, 1);
 
 				simplifiedPoints.forEach(point => { 
 					const circleBody = this.matter.add.sprite(
@@ -108,6 +108,7 @@ export class Game extends Scene
 						undefined,
 						{
 							isStatic: true,
+							mass: 1,
 							friction: 0, 
 							shape: {type: 'circle', radius: 2.5 }
 						}
