@@ -1,5 +1,6 @@
 import { Scene, GameObjects } from 'phaser';
-import TweenHelper from '../helpers/tweenHelper';
+import TweenHelper from '../helpers/TweenHelper';
+import ConstantsHelper from '../helpers/ConstantsHelper';
 
 export class MainMenu extends Scene
 {
@@ -16,7 +17,7 @@ export class MainMenu extends Scene
 	create ()
 	{
 		const { width, height } = this.scale;
-		this.background = this.add.image(width/2, height/2, 'background');
+		this.background = this.add.image(width/2, height/2, ConstantsHelper.BACKGROUND_IMAGE_KEY);
 
 		this.icon = this.add.image(width/2, 100, 'icon');
 		this.icon.setScale(0.25);
@@ -32,7 +33,7 @@ export class MainMenu extends Scene
 		TweenHelper.flashElement(this, this.title);
 
 		this.input.once('pointerdown', () => {
-			this.scene.start('Game');
+			this.scene.start('Level');
 		});
 	}
 }

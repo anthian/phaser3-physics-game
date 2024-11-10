@@ -26,4 +26,17 @@ export default class UtilsHelper {
     
         return result;
     }
+
+    static handleOutOfBounds(
+        scene: Phaser.Scene,
+        body: MatterJS.BodyType
+    ): void {
+		if(body.bounds.max.x < 0 
+			|| body.bounds.min.x > scene.scale.width 
+			|| body.bounds.max.y < 0 
+			|| body.bounds.min.y > scene.scale.height 
+		){
+			scene.scene.start('GameOver');
+		}
+	}
 }

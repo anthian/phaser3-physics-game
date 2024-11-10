@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import ConstantsHelper from '../helpers/ConstantsHelper';
 
 export class GameOver extends Scene
 {
@@ -17,7 +18,7 @@ export class GameOver extends Scene
 		this.camera.setBackgroundColor(0xff0000);
 
 		const { width, height } = this.scale;
-		this.background = this.add.image(width/2, height/2, 'background');
+		this.background = this.add.image(width/2, height/2, ConstantsHelper.BACKGROUND_IMAGE_KEY);
 		this.background.setAlpha(0.5);
 
 		this.gameover_text = this.add.text(400, 225, 'Game Over', {
@@ -28,9 +29,7 @@ export class GameOver extends Scene
 		this.gameover_text.setOrigin(0.5);
 
 		this.input.once('pointerdown', () => {
-
 			this.scene.start('MainMenu');
-
 		});
 	}
 }
