@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import ILevelScene from '../interfaces/ILevelScene';
+import ILevelScene from './interfaces/ILevelScene';
 import GameHelper from '../helpers/GameHelper';
 import UtilsHelper from '../helpers/UtilsHelper';
 import ConstantsHelper from '../helpers/ConstantsHelper';
@@ -15,7 +15,10 @@ export class Level extends Phaser.Scene implements ILevelScene
 
 	constructor ()
 	{
-		super({ key: "Level" });
+		super({ 
+			key: "Level",
+			plugins: [ 'InputPlugin', 'TweenManager', 'Clock', 'MatterJS' ],
+		});
 		this.isCompleted = false;
 		this.draws = [];
 	}
@@ -29,15 +32,15 @@ export class Level extends Phaser.Scene implements ILevelScene
 	{
 		GameHelper.add.backgroundImage(this);
 
-		GameHelper.add.goBackIcon(this, 100, 30);
-		GameHelper.add.reloadSceneIcon(this, this.scale.width - 100, 30);
+		GameHelper.add.goBackIcon(this,  this.game.scale.width * 0.05, this.game.scale.height * 0.075);
+		GameHelper.add.reloadSceneIcon(this, this.game.scale.width - this.game.scale.width * 0.05, this.game.scale.height * 0.075);
 		
 		const ballCategory = this.matter.world.nextCategory();
 		const obstacleCategory = this.matter.world.nextCategory();
 		const drawCategory = this.matter.world.nextCategory();
 
-		this.pinkBall = GameHelper.add.pinkBall(this, 300, 100, ballCategory, [ballCategory, drawCategory, obstacleCategory]);
-		this.blueBall = GameHelper.add.blueBall(this, this.scale.width - 300, 100, ballCategory, [ballCategory, drawCategory, obstacleCategory]);
+		this.pinkBall = GameHelper.add.pinkBall(this, this.game.scale.width/3, this.game.scale.height/4, ballCategory, [ballCategory, drawCategory, obstacleCategory]);
+		this.blueBall = GameHelper.add.blueBall(this, this.game.scale.width*2/3, this.game.scale.height/4, ballCategory, [ballCategory, drawCategory, obstacleCategory]);
 
 		this.pinkBall.setOnCollideWith(this.blueBall.body!, (_body: MatterJS.BodyType, collisionData: Phaser.Types.Physics.Matter.MatterCollisionData) => {
 			const midPointX = (collisionData.bodyA.position.x + collisionData.bodyB.position.x) / 2;
@@ -84,7 +87,9 @@ export class Level extends Phaser.Scene implements ILevelScene
 					this.path = null;
 				}
 				
-				this.matter.world.resume();
+				this.time.delayedCall(300, () => {
+					this.matter.world.resume();
+				});
 			}
 			
 		}, this);
@@ -92,11 +97,12 @@ export class Level extends Phaser.Scene implements ILevelScene
 
 	update() {
 		this.graphics.clear();
-        this.graphics.lineStyle(5, ConstantsHelper.BRUSH_SPRITE_COLOR, 1);
+		this.graphics.lineStyle(5, ConstantsHelper.BRUSH_SPRITE_COLOR, 1);
 		if(this.path != null){
 			this.path.draw(this.graphics);
 		}
 		UtilsHelper.handleOutOfBounds(this, (this.pinkBall.body as MatterJS.BodyType));
 		UtilsHelper.handleOutOfBounds(this, (this.blueBall.body as MatterJS.BodyType));
 	}
+
 }

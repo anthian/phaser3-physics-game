@@ -16,7 +16,8 @@
 				"allowString" : false,
 				"allowNumber" : false
 			}
-		]
+		],
+		"indent": ["error", "tab"]
 	},
-	"ignorePatterns": ["test/**/*.test.ts", "dist/**/*", "node_modules/**/*", "vite/*"]
+	"ignorePatterns": ["test/**/*.test.ts", "dist/**/*", "node_modules/**/*", "vite/*", ".github/**/*"]
 }

@@ -1,7 +1,7 @@
-import { Scene } from 'phaser';
-import ConstantsHelper from '../helpers/ConstantsHelper';
+import Phaser from 'phaser';
+import GameHelper from '../helpers/GameHelper';
 
-export class GameOver extends Scene
+export class GameOver extends Phaser.Scene
 {
 	camera: Phaser.Cameras.Scene2D.Camera;
 	background: Phaser.GameObjects.Image;
@@ -9,7 +9,10 @@ export class GameOver extends Scene
 
 	constructor ()
 	{
-		super({ key: "GameOver" });
+		super({ 
+			key: "GameOver" ,
+			plugins: [ 'InputPlugin' ],
+		});
 	}
 
 	create ()
@@ -17,16 +20,22 @@ export class GameOver extends Scene
 		this.camera = this.cameras.main
 		this.camera.setBackgroundColor(0xff0000);
 
-		const { width, height } = this.scale;
-		this.background = this.add.image(width/2, height/2, ConstantsHelper.BACKGROUND_IMAGE_KEY);
-		this.background.setAlpha(0.5);
+		this.background = 
+			GameHelper.add.backgroundImage(this)
+				.setAlpha(0.7);
 
-		this.gameover_text = this.add.text(400, 225, 'Game Over', {
+		this.gameover_text = this.add.text(this.game.scale.width/2, this.game.scale.height/2, 'Game Over', {
 			fontFamily: 'Arial Black', fontSize: 64, color: '#ffffff',
 			stroke: '#000000', strokeThickness: 8,
 			align: 'center'
 		});
 		this.gameover_text.setOrigin(0.5);
+
+		const enterKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		enterKey?.once('down', () => {
+			console.log("ENTRA");
+			this.scene.start('Level');
+		}, this);
 
 		this.input.once('pointerdown', () => {
 			this.scene.start('MainMenu');

@@ -1,30 +1,32 @@
-import { Scene, GameObjects } from 'phaser';
+import Phaser from 'phaser';
 import TweenHelper from '../helpers/TweenHelper';
-import ConstantsHelper from '../helpers/ConstantsHelper';
+import GameHelper from '../helpers/GameHelper';
 
-export class MainMenu extends Scene
+export class MainMenu extends Phaser.Scene
 {
-	background: GameObjects.Image;
-	icon: GameObjects.Image;
-	logo: GameObjects.Image;
-	title: GameObjects.Text;
+	background: Phaser.GameObjects.Image;
+	icon: Phaser.GameObjects.Image;
+	logo: Phaser.GameObjects.Image;
+	title: Phaser.GameObjects.Text;
 
-	constructor ()
+	constructor()
 	{
-		super({ key: "MainMenu" });
+		super({ 
+			key: "MainMenu",
+			plugins: [ 'InputPlugin', 'TweenManager' ],
+		});
 	}
 
 	create ()
 	{
-		const { width, height } = this.scale;
-		this.background = this.add.image(width/2, height/2, ConstantsHelper.BACKGROUND_IMAGE_KEY);
+		GameHelper.add.backgroundImage(this);
 
-		this.icon = this.add.image(width/2, 100, 'icon');
+		this.icon = this.add.image(this.game.scale.width/2, this.game.scale.height * 0.2, 'icon');
 		this.icon.setScale(0.25);
 
-		this.logo = this.add.image(width/2, 225, 'logo');
+		this.logo = this.add.image(this.game.scale.width/2, this.game.scale.height/2, 'logo');
 
-		this.title = this.add.text(width/2, 325, 'Click anywhere to start', {
+		this.title = this.add.text(this.game.scale.width/2, this.game.scale.height * 0.7, 'Click anywhere to start', {
 			fontFamily: 'Arial Black', fontSize: 24, color: '#ffffff',
 			stroke: '#000000', strokeThickness: 3,
 			align: 'center'
@@ -32,8 +34,14 @@ export class MainMenu extends Scene
 
 		TweenHelper.flashElement(this, this.title);
 
+		const enterKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+		enterKey?.once('down', () => {
+			console.log("ENTRA");
+			this.scene.start('Level');
+		}, this);
+
 		this.input.once('pointerdown', () => {
 			this.scene.start('Level');
-		});
+		}, this);
 	}
 }
