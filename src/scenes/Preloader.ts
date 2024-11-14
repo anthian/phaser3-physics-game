@@ -64,8 +64,7 @@ export class Preloader extends Phaser.Scene
 			this.progressBarContainerY, 
 			this.progressBarContainerWidth, 
 			this.progressBarContainerHeight
-		)
-		.setStrokeStyle(1, 0x000000);
+		).setStrokeStyle(1, 0x000000);
 
 		//  This is the progress bar itself. It will increase in size from the left based on the % of progress.
 		this.progressBar = this.add.rectangle(

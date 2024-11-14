@@ -19,5 +19,21 @@
 		],
 		"indent": ["error", "tab"]
 	},
-	"ignorePatterns": ["test/**/*.test.ts", "dist/**/*", "node_modules/**/*", "vite/*", ".github/**/*"]
+	"ignorePatterns": [
+		".github/**/*",
+		"dist/**/*",
+		"node_modules/**/*",
+		"public**/*",
+		"test/**/*.test.ts",
+		"vite/*",
+		".eslintrc.json",
+		".gitignore",
+		"eslint-results.sarif",
+		"index.html",
+		"LICENSE",
+		"package-lock.json",
+		"package.json",
+		"README.md",
+		"tsconfig.json"
+	]
 }
