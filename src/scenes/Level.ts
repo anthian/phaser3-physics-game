@@ -1,14 +1,19 @@
 import Phaser from 'phaser';
+import MatterJS from "matter";
 import ILevelScene from './interfaces/ILevelScene';
 import GameHelper from '../helpers/GameHelper';
 import UtilsHelper from '../helpers/UtilsHelper';
 import ConstantsHelper from '../helpers/ConstantsHelper';
+import GeomType from '../helpers/types/GeomType';
+import ObstacleType from '../helpers/types/ObstacleType';
 
 export class Level extends Phaser.Scene implements ILevelScene 
 {
 	pinkBall: Phaser.Physics.Matter.Image;
 	blueBall: Phaser.Physics.Matter.Image;
 	graphics: Phaser.GameObjects.Graphics;
+	obstacleBodies: MatterJS.BodyType[];
+	obstacleGeometries: GeomType[];
 	draws: Phaser.Physics.Matter.Sprite[][];
 	path: Phaser.Curves.Path | null;
 	isCompleted: boolean;
@@ -20,11 +25,14 @@ export class Level extends Phaser.Scene implements ILevelScene
 			plugins: [ 'InputPlugin', 'TweenManager', 'Clock', 'MatterJS' ],
 		});
 		this.isCompleted = false;
+		this.obstacleBodies = [];
+		this.obstacleGeometries = [];
 		this.draws = [];
 	}
 
 	init(){
 		this.isCompleted = false;
+		this.path = null;
 		this.matter.world.pause();
 	}
 
@@ -50,11 +58,24 @@ export class Level extends Phaser.Scene implements ILevelScene
 			this.matter.world.pause();
 		});
 
+		const obstacle1Geometry = new Phaser.Geom.Rectangle(
+			0, 
+			this.game.scale.height - this.game.scale.height/16,
+			this.game.scale.width,
+			this.game.scale.height/16
+		);
+
+		const obstacle1: ObstacleType = GameHelper.add.obstacle(this, obstacle1Geometry, obstacleCategory);
+		this.obstacleGeometries.push(obstacle1.geometry);
+		if(obstacle1.body != null){
+			this.obstacleBodies.push(obstacle1.body);
+		}
+			
 		this.graphics = this.add.graphics(); 
 		
 		this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+			this.matter.world.pause();
 			if(!this.isCompleted){
-				this.matter.world.pause();
 				this.path = new Phaser.Curves.Path(pointer.x, pointer.y);
 			}
 		}, this);
@@ -70,9 +91,10 @@ export class Level extends Phaser.Scene implements ILevelScene
 	
 		this.input.on('pointerup', () => {
 			//Convert path to points array to apply physics
-			if(!this.isCompleted && this.path !== null && typeof this.path !== 'undefined'){
+			if(!this.isCompleted && this.path != null && typeof this.path !== 'undefined'){
 				const points = this.path.getPoints(3);
-				const simplifiedPoints = UtilsHelper.simplifyPath(points, 1);
+				
+				const simplifiedPoints = points.length>2 ? UtilsHelper.simplifyPath(points, 1) : points;
 				const drawingPoints: Phaser.Physics.Matter.Sprite[] = [];
 
 				simplifiedPoints.forEach(point => { 
@@ -86,21 +108,26 @@ export class Level extends Phaser.Scene implements ILevelScene
 					this.path.destroy();
 					this.path = null;
 				}
-				
+
 				this.time.delayedCall(300, () => {
 					this.matter.world.resume();
 				});
 			}
-			
+
 		}, this);
 	}
 
 	update() {
 		this.graphics.clear();
-		this.graphics.lineStyle(5, ConstantsHelper.BRUSH_SPRITE_COLOR, 1);
+
 		if(this.path != null){
+			
+			this.graphics.lineStyle(5, ConstantsHelper.BRUSH_SPRITE_COLOR, 1);
 			this.path.draw(this.graphics);
 		}
+
+		GameHelper.update.renderObstacles(this);
+
 		UtilsHelper.handleOutOfBounds(this, (this.pinkBall.body as MatterJS.BodyType));
 		UtilsHelper.handleOutOfBounds(this, (this.blueBall.body as MatterJS.BodyType));
 	}

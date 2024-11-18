@@ -42,7 +42,13 @@ export default class ConstantsHelper {
 	static readonly BRUSH_SPRITE_FRICTION_STATIC: number = 0.5;
 	static readonly BRUSH_SPRITE_SHAPE: Phaser.Types.Physics.Matter.MatterSetBodyConfig = {type: 'circle', radius: 2.5 };
 
-	static readonly OBSTACLE_COLOR: number = 0x949694;
+	static readonly OBSTACLE_FILL_COLOR: number = 0X777777;
+	static readonly OBSTACLE_LINE_COLOR: number = 0x555555;
+	static readonly OBSTACLE_LINE_SIZE: number = 2;
+	static readonly OBSTACLE_RESTITUTION: number = 0;
+	static readonly OBSTACLE_FRICTION: number = 0.015;
+	static readonly OBSTACLE_FRICTION_AIR: number = 0.0015;
+	static readonly OBSTACLE_FRICTION_STATIC: number = 0.25;
 
 	static readonly ICON_SIZE: number = 32;
 	static readonly GO_BACK_ICON: string = 'go-back-icon';

@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
+import MatterJS from 'matter';
 import ILevelScene from '../scenes/interfaces/ILevelScene';
 import ConstantsHelper from './ConstantsHelper';
+import ObstacleType from './types/ObstacleType';
+import GeomType from './types/GeomType';
 
 export default class GameHelper {
 
@@ -50,6 +53,69 @@ export default class GameHelper {
 			collidesWith: number[]
 		): Phaser.Physics.Matter.Image => {
 			return GameHelper._addBall(scene, x, y, collisionCategory, collidesWith, ConstantsHelper.BLUE_BALL_IMAGE_KEY);
+		}),
+
+		obstacle: ((
+			scene: ILevelScene,
+			geometry: GeomType,
+			obstacleCategory: number,
+		): ObstacleType => {
+
+			let body: MatterJS.BodyType | null = null;
+			const obstacleBaseConfig = {
+				isStatic: true,
+				restitution: ConstantsHelper.OBSTACLE_RESTITUTION,
+				friction: ConstantsHelper.OBSTACLE_FRICTION,
+				frictionAir: ConstantsHelper.OBSTACLE_FRICTION_AIR,
+				frictionStatic: ConstantsHelper.OBSTACLE_FRICTION_STATIC,
+				collisionFilter: {
+					category: obstacleCategory
+				}	
+			}
+
+			if(geometry instanceof Phaser.Geom.Circle){
+				body = scene.matter.add.circle(
+					geometry.x,
+					geometry.y,
+					geometry.radius,
+					{
+						...obstacleBaseConfig,
+						density: Math.PI * Math.pow(geometry.radius, 2)
+					}
+				)
+			}else if(geometry instanceof Phaser.Geom.Rectangle){
+				body = scene.matter.add.rectangle(
+					geometry.centerX,
+					geometry.centerY,
+					geometry.width,
+					geometry.height,
+					{
+						...obstacleBaseConfig,
+						density: geometry.width * geometry.height
+					}
+				)
+			}else if(geometry instanceof Phaser.Geom.Triangle){
+				const center = Phaser.Geom.Triangle.Centroid(geometry);
+				const vertices = [ 
+					{ x: geometry.x1, y: geometry.y1 }, 
+					{ x: geometry.x2, y: geometry.y2 }, 
+					{ x: geometry.x3, y: geometry.y3 } 
+				];
+
+				body = scene.matter.add.fromVertices(
+					center.x,
+					center.y,
+					vertices,
+					{
+						...obstacleBaseConfig,
+						density: Phaser.Geom.Triangle.Area(geometry),
+					}
+				)		
+			}
+			return {
+				geometry,
+				body
+			}		
 		}),
 
 		drawingPoint: ((
@@ -123,6 +189,25 @@ export default class GameHelper {
 				scene.scene.restart();
 			});
 			return button;
+		}),
+	};
+
+	static readonly update = {
+		renderObstacles: ((
+			scene: ILevelScene
+		) => {
+			scene.obstacleGeometries.forEach((geom) => {
+				scene.graphics.lineStyle(ConstantsHelper.OBSTACLE_LINE_SIZE, ConstantsHelper.OBSTACLE_LINE_COLOR, 1);
+				scene.graphics.fillStyle(ConstantsHelper.OBSTACLE_FILL_COLOR, 1);
+
+				if(geom instanceof Phaser.Geom.Circle){
+					scene.graphics.fillCircleShape(geom);
+				} else if(geom instanceof Phaser.Geom.Rectangle){
+					scene.graphics.fillRectShape(geom);
+				}else if(geom instanceof Phaser.Geom.Triangle){
+					scene.graphics.fillTriangleShape(geom);
+				}
+			});	
 		}),
 	};
 
